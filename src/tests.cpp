@@ -7,7 +7,11 @@ int my_strlen(char *str) {
      */
 
     // IMPLEMENT YOUR CODE HERE
-    return 0;
+    int digit = 0;
+    for (int i = 0; str[i] != '\0'; i ++){
+        digit ++;
+    }
+    return digit;
 }
 
 
@@ -19,6 +23,12 @@ void my_strcat(char *str_1, char *str_2) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+    int i = 0;
+    for (;str_1[i] != '\0'; i ++);
+    for (int j = 0; str_2[j] != '\0'; i ++ ,j ++){
+        str_1[i] = str_2[j];
+    }
+    str_1[i] = '\0';
 }
 
 
