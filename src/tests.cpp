@@ -41,6 +41,32 @@ char* my_strstr(char *s, char *p) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+    for (int i = 0; s[i] != '\0'; i++) {
+        int j = 0;
+        for (; p[j] != '\0' && s[i + j] == p[j]; j++);
+        if (p[j] == '\0') {
+            return &s[i];
+        }
+    }
+    // int len1 = my_strlen(s);
+    // int len2 = my_strlen(p);
+    // int minus = len1 - len2;
+    // if (len2 <= len1){                                   //若len2>len1，则p不可能是s的子串
+    //     for (int i = 0; i <= minus; i ++){               //遍历s的每一个字符，下标超过minus后s长度不够
+    //         int k = 0;
+    //             for (int j = 0; j < len2; j ++){
+    //                 if (s[j+i] == p [j]){                    //每匹配一项就让k+1
+    //                   k ++;
+    //                 }
+    //                 else{                                    //只要有一项不匹配就跳过
+    //                     break;
+    //                 }
+    //             }
+    //             if (k == len2){                          //若j==len2，则说明p的每一项都匹配成功
+    //                 return &s[i];
+    //             }
+    //     }
+    // }
     return 0;
 }
 
@@ -107,6 +133,17 @@ void rgb2gray(float *in, float *out, int h, int w) {
 
     // IMPLEMENT YOUR CODE HERE
     // ...
+
+    // 遍历读取每个像素点
+    for (int i = 0; i < h; i++){                         //行循环遍历
+        for (int j = 0; j < w; j++){                     //列循环遍历
+            int tag = (i * w + j) *3;                    //计算彩色图片每个像素的起始地址
+            float R = in[tag];                           //R的值
+            float G = in[tag + 1];                       //G的值
+            float B = in[tag + 2];                       //B的值
+            out[i * w + j] = 0.1140 * B  + 0.5870 * G + 0.2989 * R;
+        }
+    }
 }
 
 // 练习5，实现图像处理算法 resize：缩小或放大图像
@@ -205,10 +242,56 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
      *     3. 注意上面的方法中，四个邻居点的坐标可能会超出 src 的范围，
      *        所以需要对其进行边界检查
      */
-
-    int new_h = h * scale, new_w = w * scale;
     // IMPLEMENT YOUR CODE HERE
+    int new_h = h * scale, new_w = w * scale;
+    for (int y = 0; y < new_h; y++){
+        for (int x = 0; x < new_w; x++){
+            float x0 = x / scale, y0 = y / scale;
+            int x1 = static_cast<int>(x0), y1 = static_cast<int>(y0);
 
+            //确定相对位置
+            int x2 = x1 + 1, y2 = y1 + 1;
+            if(x2 >= w) x2 = w -1;
+            if(y2 >= h) y2 = h -1;
+
+            for (int ch = 0; ch < c; ch++){
+                float P1 = in[(y1 * w + x1) * c + ch];
+                float P2 = in[(y2 * w + x2) * c + ch];
+                float P3 = in[(y1 * w + x2) * c + ch];
+                float P4 = in[(y2 * w + x1) * c + ch];
+
+                float dx = x0 - x1, dy = y0 - y1;
+                out[(y * new_w + x) * c + ch] = P1 * (1 - dx) * (1 - dy) + P2 * dx * (1 - dy) + P3 * (1 - dx) * dy + P4 * dx * dy;
+            }
+        }
+    }
+
+
+
+    // int new_h = h * scale, new_w = w * scale;
+    // for (int y = 0; y < new_h; y++){                                         //遍历行，这里的行是dst的行（dst是目标图像，src是原图像），遍历dst行和列的目的是让每一个dst中的像素点都能找到其在src中对应的坐标
+    //     for (int x = 0; x < new_w; x++){                                     //遍历列，这里的列是dst的列，同上
+    //         float x0 = x / scale, y0 = y / scale;                            //计算出其在 src 中的坐标 float(x0, y0)
+    //         int x1 = static_cast<int>(x0), y1 = static_cast<int>(y0);        //向下取整后可能dst的不同像素在src中有相同坐标
+
+    //         //确定相对位置
+    //         int x2 = x1 + 1, y2 = y1 + 1;
+    //         if (x2 >= w) x2 = w - 1;                                         //边界检查，如果超出范围就复制自身作为邻居
+    //         if (y2 >= h) y2 = h - 1;
+
+    //         for (int slide = 0; slide < c; slide++){                         //遍历通道，c表示通道长度，一般的RGB表示中 c = 3，则slide是分别对R，G，B三个通道进行处理
+    //             float P1 = in[(y1 * w + x1) * c + slide];                    //计算出其在 src 中的四个邻居点，y1 * w + x1表示在src中该像素点的地址（第y1行第x1个，乘以c是因为每个像素点有c个通道，slide表示当前处理的通道
+    //             float P2 = in[(y1 * w + x2) * c + slide];
+    //             float P3 = in[(y2 * w + x1) * c + slide];
+    //             float P4 = in[(y2 * w + x2) * c + slide];
+
+    //             // 计算出dx和dy，dx表示x0和x1的距离，dy表示y0和y1的距离（根据上面的公式，dx = x - x1, dy = y - y1）
+    //             float dx = x0 - x1, dy = y0 - y1;
+    //             //最后修改输出图片的不同位置的数组元素值
+    //             out[(y * new_w + x) * c + slide] = P1 * (1 - dx) * (1 - dy) + P2 * dx * (1 - dy) + P3 * (1 - dx) * dy + P4 * dx * dy;
+    //         }
+    //     }
+    // }
 }
 
 
@@ -217,8 +300,9 @@ void hist_eq(float *in, int h, int w) {
     /**
      * 将输入图片进行直方图均衡化处理。参数含义：
      * (1) float *in: 输入的灰度图片。
-     * (2) int h:     height，即图片的高度。
-     * (3) int w:      width，即图片的宽度。
+     * (2) float *out: 输出的灰度图片。
+     * (3) int h:     height，即图片的高度。
+     * (4) int w:      width，即图片的宽度。
      *
      * 参考资料：
      * https://blog.csdn.net/qq_15971883/article/details/88699218
@@ -231,4 +315,52 @@ void hist_eq(float *in, int h, int w) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+
+
+
+    //1. 计算原始图像的像素总个数(sum)
+    int sum = h * w;
+    int a[256] = {0};                        //灰度级数组a，a[i]表示灰度级为i的像素点个数
+
+    
+
+    
+    //2. 计算原始图像的灰度直方图 
+    for (int i = 0; i < sum; i ++){
+        a[(int)in[i]] ++;                    //统计灰度级个数
+    }
+
+    
+
+
+    //3. 计算原始图像的灰度分布频率
+    float b[256] = {0};                      //灰度级数组b，b[i]表示灰度级为i的像素点的分布频率
+    for (int i = 0; i < 256; i ++){
+        b[i] = (float)a[i] / sum;            //计算灰度分布频率
+    }
+
+
+
+    //4. 计算原始图像的灰度累积分布频率
+    float c[256] = {0};                      //灰度级数组c，c[i]表示灰度级为i的像素点的累积分布频率
+    c[0] = b[0];
+    for (int i = 1; i < 256; i ++){
+        c[i] = c[i - 1] + b[i];              //计算累积分布频率
+    }
+
+
+
+    //5. 将归一化的累积分布频率乘 255 再四舍五入，以使得均衡化后图像的灰度级与归一化前的原始图像一致
+    int d[256] = {0};                        //灰度级数组d，d[i]表示灰度级为i的像素点的均衡化后的灰度级
+    for (int i = 0; i < 256; i ++){
+        d[i] = (int)(c[i] * 255 + 0.5);      //计算均衡化后的灰度级
+    }
+
+
+    //6. 将原始图像的灰度级映射到均衡化后的灰度级
+    for (int i = 0; i < sum; i ++){
+    in[i] = d[(int)in[i]];                  //将原始图像的灰度级映射到均衡化后的灰度级 (输入灰度值作为索引，查找映射后的灰度值)
+    }
+
+
 }
