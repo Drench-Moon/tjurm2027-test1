@@ -53,16 +53,11 @@ char* my_strstr(char *s, char *p) {
     // int minus = len1 - len2;
     // if (len2 <= len1){                                   //若len2>len1，则p不可能是s的子串
     //     for (int i = 0; i <= minus; i ++){               //遍历s的每一个字符，下标超过minus后s长度不够
-    //         int k = 0;
     //             for (int j = 0; j < len2; j ++){
-    //                 if (s[j+i] == p [j]){                    //每匹配一项就让k+1
-    //                   k ++;
-    //                 }
-    //                 else{                                    //只要有一项不匹配就跳过
-    //                     break;
-    //                 }
+    //                 if (s[j+i] != p [j]){
+    //                    break;                              //若s的第i个字符开始的子串与p不匹配，则跳出循环
     //             }
-    //             if (k == len2){                          //若j==len2，则说明p的每一项都匹配成功
+    //             if (j == len2){                          //若j==len2，则说明p的每一项都匹配成功
     //                 return &s[i];
     //             }
     //     }
