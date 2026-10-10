@@ -315,12 +315,11 @@ void hist_eq(float *in, int h, int w) {
 
     //1. 计算原始图像的像素总个数(sum)
     int sum = h * w;
-    int a[256] = {0};                        //灰度级数组a，a[i]表示灰度级为i的像素点个数
 
-    
 
-    
+
     //2. 计算原始图像的灰度直方图 
+    int a[256] = {0};                        //灰度级数组a，a[i]表示灰度级为i的像素点个数
     for (int i = 0; i < sum; i ++){
         a[(int)in[i]] ++;                    //统计灰度级个数
     }
