@@ -251,9 +251,9 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
 
             for (int ch = 0; ch < c; ch++){
                 float P1 = in[(y1 * w + x1) * c + ch];
-                float P2 = in[(y2 * w + x2) * c + ch];
-                float P3 = in[(y1 * w + x2) * c + ch];
-                float P4 = in[(y2 * w + x1) * c + ch];
+                float P2 = in[(y1 * w + x2) * c + ch];
+                float P3 = in[(y2 * w + x1) * c + ch];
+                float P4 = in[(y2 * w + x2) * c + ch];
 
                 float dx = x0 - x1, dy = y0 - y1;
                 out[(y * new_w + x) * c + ch] = P1 * (1 - dx) * (1 - dy) + P2 * dx * (1 - dy) + P3 * (1 - dx) * dy + P4 * dx * dy;
